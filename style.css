@@ -1,0 +1,765 @@
+:root {
+    /* Color Palette */
+    --primary-clean: #1B5E20;     /* Deep Medical Green */
+    --primary-main: #2E7D32;      /* Standard Green */
+    --primary-soft: #81C784;      /* Soft Mint Green */
+    --primary-light: #E8F5E9;     /* Very Light Mint */
+    --bg-gradient-start: #f2fcf5;
+    --bg-gradient-end: #ffffff;
+    
+    --text-main: #1C2833;
+    --text-muted: #5D6D7E;
+    
+    --glass-bg: rgba(255, 255, 255, 0.65);
+    --glass-border: rgba(255, 255, 255, 0.8);
+    --glass-shadow: 0 12px 32px rgba(46, 125, 50, 0.08);
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
+    color: var(--text-main);
+    overflow-x: hidden;
+    min-height: 100vh;
+}
+
+.roadmap-container {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Header */
+.roadmap-header {
+    text-align: center;
+    padding: 40px 20px 20px;
+    z-index: 10;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 12px;
+    color: var(--primary-main);
+    /* Removed custom relative position that was breaking children overlaps */
+}
+
+.logo .logo-icon {
+    font-size: 32px;
+}
+
+.logo h1 {
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+.roadmap-header h2 {
+    font-size: 36px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: var(--text-main);
+}
+
+.roadmap-header h2 span {
+    color: var(--primary-main);
+}
+
+.roadmap-header p {
+    color: var(--text-muted);
+    font-size: 16px;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* Timeline Indicator */
+.timeline-indicator-wrapper {
+    position: relative;
+    max-width: 900px;
+    width: 90%;
+    margin: 30px auto 10px;
+    z-index: 10;
+}
+
+.timeline-track {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: #e0e0e0;
+    transform: translateY(-50%);
+    border-radius: 4px;
+    z-index: 1;
+}
+
+.timeline-progress {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    background: var(--primary-main);
+    width: 0%;
+    transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 4px;
+}
+
+.timeline-markers {
+    display: flex;
+    justify-content: space-between;
+    position: relative;
+    z-index: 2;
+}
+
+.marker {
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 0;
+    outline: none;
+}
+
+.marker .dot {
+    width: 20px;
+    height: 20px;
+    background: white;
+    border: 3px solid #e0e0e0;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 0 0 rgba(46, 125, 50, 0);
+}
+
+.marker span {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-muted);
+    transition: color 0.3s ease;
+}
+
+.marker:hover .dot {
+    border-color: var(--primary-soft);
+}
+
+.marker.active .dot {
+    border-color: var(--primary-main);
+    background: var(--primary-main);
+    box-shadow: 0 0 0 6px rgba(46, 125, 50, 0.15);
+}
+
+.marker.active span {
+    color: var(--primary-main);
+}
+
+/* Horizontal Scroll Area */
+.scroll-container {
+    display: flex;
+    gap: 40px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    padding: 50px 0;
+    flex: 1;
+    
+    /* Hide Scrollbar */
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+}
+.scroll-container::-webkit-scrollbar {
+    display: none;
+}
+
+.scroll-container::before,
+.scroll-container::after {
+    content: '';
+    flex-shrink: 0;
+    width: calc(50vw - 230px); /* 50vw - half the card width (420/2 + gaps) */
+}
+
+/* Cards */
+.phase-card {
+    min-width: 420px;
+    max-width: 420px;
+    scroll-snap-align: center;
+    transition: all 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
+    transform: scale(0.9);
+    opacity: 0.4;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+}
+
+.phase-card.active {
+    transform: scale(1.02);
+    opacity: 1;
+    z-index: 5;
+}
+
+.card-glass {
+    background: var(--glass-bg);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--glass-border);
+    border-radius: 24px;
+    padding: 32px;
+    box-shadow: var(--glass-shadow);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Add a subtle top highlight line to cards */
+.card-glass::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary-soft) 0%, var(--primary-main) 100%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.phase-card.active .card-glass::before {
+    opacity: 1;
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.phase-badge {
+    background: var(--primary-light);
+    color: var(--primary-main);
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.duration {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-muted);
+}
+
+.title {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--text-main);
+    margin-bottom: 12px;
+}
+
+.description {
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--text-muted);
+    margin-bottom: 24px;
+}
+
+.features-list {
+    margin-bottom: 24px;
+    flex: 1;
+}
+
+.features-list h4, .outcome h4 {
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #90A4AE;
+    margin-bottom: 12px;
+}
+
+.features-list ul {
+    list-style: none;
+}
+
+.features-list li {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 14px;
+    color: var(--text-main);
+    margin-bottom: 10px;
+    font-weight: 500;
+}
+
+.features-list li .material-symbols-rounded.icon {
+    font-size: 20px;
+    color: var(--primary-soft);
+}
+
+/* Custom Checkboxes */
+.feature-checkbox {
+    display: inline-flex;
+    align-items: center;
+    position: relative;
+    cursor: pointer;
+    user-select: none;
+    width: 20px;
+    height: 20px;
+    margin-right: 4px;
+    vertical-align: middle;
+}
+
+.feature-checkbox input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+}
+
+.checkmark {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 20px;
+    width: 20px;
+    background-color: rgba(255,255,255,0.7);
+    border: 2px solid var(--text-muted);
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    color: transparent;
+}
+
+/* Hover effect only in edit mode (handled via body class) */
+body.admin-mode .feature-checkbox:hover input ~ .checkmark {
+    background-color: var(--primary-light);
+    border-color: var(--primary-soft);
+}
+
+.feature-checkbox input:checked ~ .checkmark {
+    background-color: #00e676; /* Bright Green */
+    border-color: #00e676;
+    color: white;
+}
+
+/* Base rule: grey out the checkmark when disabled */
+.feature-checkbox input:disabled ~ .checkmark {
+    background-color: #eee;
+    border-color: #ccc;
+    cursor: auto /* Keep not allowed feeling but normal pointer is fine for view mode */;
+}
+
+/* Ensure the wrapper respects opacity for disabled empty boxes */
+.feature-checkbox:has(input:disabled:not(:checked)) {
+    opacity: 0.5;
+}
+
+/* Ensure the wrapper forces FULL opacity if it's CHECKED (even if disabled in view mode) */
+.feature-checkbox:has(input:disabled:checked) {
+    opacity: 1 !important;
+}
+
+/* Disabled but CHECKED state in view mode - Important overrides */
+.feature-checkbox input:checked:disabled ~ .checkmark {
+    background-color: #00e676 !important; /* Stay bright green */
+    border-color: #00e676 !important;
+    color: white !important;
+    opacity: 1 !important; /* Override opacity drop */
+}
+
+li.completed {
+    text-decoration: line-through;
+    color: var(--text-muted);
+    opacity: 0.7;
+}
+
+/* Locked Phases */
+.phase-card.locked {
+    opacity: 0.4;
+    filter: grayscale(0.5);
+    pointer-events: none; /* Prevents interaction with the card entirely if needed, but we currently only disable checkboxes */
+}
+
+/* We only want to prevent interaction on the actual input list if it's locked */
+.phase-card.locked .features-list {
+    pointer-events: none;
+}
+
+.phase-card.locked.active {
+    opacity: 0.8;
+}
+
+/* Completion Seal */
+.completion-seal {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.5) rotate(-15deg);
+    background: rgba(46, 125, 50, 0.1);
+    border: 4px solid var(--primary-main);
+    border-radius: 50%;
+    width: 220px;
+    height: 220px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary-main);
+    opacity: 0;
+    z-index: 10;
+    pointer-events: none;
+    transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    backdrop-filter: blur(4px);
+}
+
+.completion-seal .material-symbols-rounded {
+    font-size: 64px;
+    margin-bottom: 8px;
+}
+
+.completion-seal p {
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    margin: 0;
+}
+
+/* Show Seal when Phase is completed */
+.phase-card.completed .completion-seal {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1) rotate(-15deg);
+}
+
+/* Admin Toggle Button (The Logo Icon itself) */
+.roadmap-header {
+    position: relative; 
+}
+
+.logo-toggle-btn {
+    background: transparent;
+    border: none;
+    padding: 0;
+    margin: 0;
+    color: inherit;
+    cursor: auto; /* Keep it looking non-interactive to normal users */
+    display: inline-flex;
+    align-items: center;
+    position: relative;
+    outline: none;
+}
+
+/* Indicator that admin mode is ON */
+body.admin-mode .logo-toggle-btn::after {
+    content: 'EDIT MODE ON';
+    position: absolute;
+    top: -25px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #ff5252;
+    color: white;
+    font-size: 10px;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-weight: bold;
+    letter-spacing: 1px;
+    white-space: nowrap;
+    pointer-events: none; /* Make sure the badge itself doesn't steal clicks */
+}
+
+/* Hide checkboxes entirely when NOT in admin mode, OR make them read-only visual indicators */
+/* We'll make them read-only indicators by silencing pointer events if not admin mode */
+body:not(.admin-mode) .feature-checkbox {
+    pointer-events: none;
+}
+
+.outcome {
+    background: var(--primary-light);
+    padding: 20px;
+    border-radius: 16px;
+    border: 1px solid rgba(129, 199, 132, 0.2);
+}
+
+.outcome p {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--primary-clean);
+    margin-bottom: 16px;
+    line-height: 1.5;
+}
+
+.icons-group {
+    display: flex;
+    gap: 16px;
+}
+
+.icons-group .material-symbols-rounded {
+    font-size: 28px;
+    color: var(--primary-main);
+    background: white;
+    padding: 8px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(46, 125, 50, 0.08);
+}
+
+/* Animations & Responsive */
+@media (max-width: 768px) {
+    .scroll-container::before,
+    .scroll-container::after {
+        width: calc(50vw - 160px); /* Adjust for smaller cards */
+    }
+    
+    .phase-card {
+        min-width: 320px;
+        max-width: 320px;
+    }
+    
+    .roadmap-header h2 {
+        font-size: 28px;
+    }
+    
+    .timeline-indicator-wrapper {
+        margin: 20px auto 0;
+    }
+    
+    .marker span {
+        display: none; /* Hide text on very small screens to save space */
+    }
+}
+
+/* ------------------------------------- */
+/* Vertical Features Section (17 points) */
+/* ------------------------------------- */
+
+.features-vertical-section {
+    padding: 100px 20px;
+    background: #ffffff;
+    position: relative;
+    border-top: 1px solid var(--primary-light);
+}
+
+.features-vertical-header {
+    text-align: center;
+    margin-bottom: 80px;
+}
+
+.features-vertical-header h2 {
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--primary-clean);
+    margin-bottom: 12px;
+}
+
+.features-vertical-header p {
+    font-size: 16px;
+    color: var(--text-muted);
+}
+
+.vertical-timeline-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    position: relative;
+    padding: 20px 0;
+}
+
+/* Center Line */
+.vertical-timeline-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 4px;
+    background: var(--primary-light);
+    border-radius: 4px;
+}
+
+.v-feature-row {
+    display: flex;
+    justify-content: flex-end; /* By default, flex-end puts item on the right if padding handles it, wait. Let's use width 50% */
+    width: 100%;
+    position: relative;
+    margin-bottom: 60px;
+    opacity: 0; 
+    transition: all 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+/* Odd items (Right side block) -> slide from right + slightly down + scaled down */
+.v-feature-row.from-right {
+    justify-content: flex-end;
+    transform: translate(80px, 40px) scale(0.95);
+}
+.v-feature-row.from-right .v-feature-content {
+    width: 45%;
+}
+
+/* Even items (Left side block) -> slide from left + slightly down + scaled down */
+.v-feature-row.from-left {
+    justify-content: flex-start;
+    transform: translate(-80px, 40px) scale(0.95);
+}
+.v-feature-row.from-left .v-feature-content {
+    width: 45%;
+}
+
+/* The actual box */
+.v-feature-content {
+    width: 45%;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    padding: 32px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    position: relative;
+    backdrop-filter: blur(16px);
+    transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+/* Active Glow State */
+.v-feature-row.active .v-feature-content {
+    box-shadow: 0 15px 40px rgba(46, 125, 50, 0.15), 0 0 20px rgba(129, 199, 132, 0.4);
+    border-color: rgba(129, 199, 132, 0.6);
+    transform: translateY(-5px);
+}
+
+/* Icons */
+.v-feature-icon-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    background: var(--primary-light);
+    border-radius: 12px;
+    margin-bottom: 20px;
+    color: var(--primary-main);
+}
+
+.v-feature-icon-wrapper .v-feature-icon {
+    font-size: 28px;
+}
+
+.v-feature-row.active .v-feature-icon-wrapper {
+    background: var(--primary-main);
+    color: white;
+    box-shadow: 0 8px 20px rgba(46, 125, 50, 0.25);
+}
+
+/* Number badge acting as timeline dot */
+.v-feature-number {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 40px;
+    height: 40px;
+    background: white;
+    color: var(--text-muted);
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-size: 16px;
+    border: 4px solid var(--primary-light);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    z-index: 2;
+    transition: all 0.4s ease;
+}
+
+/* Timeline marker lights up when active */
+.v-feature-row.active .v-feature-number {
+    background: var(--primary-main);
+    color: white;
+    border-color: var(--primary-soft);
+    box-shadow: 0 0 0 6px rgba(46, 125, 50, 0.15), 0 4px 12px rgba(46, 125, 50, 0.3);
+    transform: translate(-50%, -50%) scale(1.1);
+}
+
+.v-feature-text h3 {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text-main);
+    margin-bottom: 8px;
+    letter-spacing: -0.5px;
+}
+
+.v-desc, .v-adv {
+    font-size: 14px;
+    line-height: 1.6;
+    margin-bottom: 8px;
+    color: var(--text-muted);
+}
+.v-desc strong, .v-adv strong {
+    color: var(--text-main);
+}
+
+/* Animation trigger class */
+.v-feature-row.show {
+    opacity: 1;
+    transform: translate(0, 0) scale(1); /* Resets the translate and scale to normal */
+}
+
+/* Connecting small arrow tails (optional but nice) */
+.v-feature-row.from-right .v-feature-content::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: -10px;
+    transform: translateY(-50%);
+    border-width: 10px 10px 10px 0;
+    border-style: solid;
+    border-color: transparent var(--glass-border) transparent transparent;
+}
+.v-feature-row.from-left .v-feature-content::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    right: -10px;
+    transform: translateY(-50%);
+    border-width: 10px 0 10px 10px;
+    border-style: solid;
+    border-color: transparent transparent transparent var(--glass-border);
+}
+
+/* Responsive Vertical Timeline */
+@media (max-width: 768px) {
+    .vertical-timeline-container::before {
+        left: 30px;
+    }
+    .v-feature-row.from-right .v-feature-content,
+    .v-feature-row.from-left .v-feature-content {
+        margin-left: 70px; /* Offset to make room for absolute center line dot now on left */
+        margin-right: 0;
+        width: calc(100% - 70px);
+    }
+    .v-feature-row .v-feature-number {
+        left: 30px;
+    }
+    .v-feature-row.from-left .v-feature-content::before {
+        right: auto;
+        left: -10px;
+        border-width: 10px 10px 10px 0;
+        border-color: transparent var(--glass-border) transparent transparent;
+    }
+    .v-feature-row.from-left,
+    .v-feature-row.from-right {
+        justify-content: flex-end; /* All blocks flush right on small screens */
+    }
+}
