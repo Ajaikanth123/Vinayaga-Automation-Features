@@ -30,9 +30,26 @@ body {
 }
 
 .roadmap-container {
-    height: 100vh;
+    min-height: 100vh;
     display: flex;
     flex-direction: column;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    position: relative;
+    padding-bottom: 80px; /* Provide space for the scroll indicator */
+}
+
+@media (max-width: 900px) {
+    .roadmap-container {
+        max-width: 900px;
+    }
+}
+
+@media (max-width: 768px) {
+    .roadmap-container {
+        max-width: 100%;
+    }
 }
 
 /* Header */
@@ -184,7 +201,7 @@ body {
 .scroll-container::after {
     content: '';
     flex-shrink: 0;
-    width: calc(50vw - 230px); /* 50vw - half the card width (420/2 + gaps) */
+    width: calc(50% - 210px); /* Use 50% relative to container width */
 }
 
 /* Cards */
@@ -521,7 +538,7 @@ body:not(.admin-mode) .feature-checkbox {
 @media (max-width: 768px) {
     .scroll-container::before,
     .scroll-container::after {
-        width: calc(50vw - 160px); /* Adjust for smaller cards */
+        width: calc(50% - 160px); /* Adjust for smaller cards */
     }
     
     .phase-card {
@@ -540,6 +557,73 @@ body:not(.admin-mode) .feature-checkbox {
     .marker span {
         display: none; /* Hide text on very small screens to save space */
     }
+}
+
+/* Scroll Indicator */
+.scroll-indicator {
+    position: absolute;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    z-index: 20;
+    transition: opacity 0.5s ease, transform 0.5s ease;
+    pointer-events: none;
+}
+
+.scroll-indicator.hidden {
+    opacity: 0;
+    transform: translate(-50%, 20px);
+}
+
+.scroll-indicator .animated-arrow-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    margin-bottom: 4px;
+}
+
+.scroll-indicator .glow-pulse {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: rgba(129, 199, 132, 0.4);
+    border-radius: 50%;
+    animation: pulseGlow 2s infinite ease-out;
+}
+
+.scroll-indicator .material-symbols-rounded {
+    font-size: 28px;
+    color: var(--primary-main);
+    position: relative;
+    z-index: 2;
+    animation: bounceArrow 1.5s infinite ease-in-out;
+}
+
+.scroll-indicator .indicator-text {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--primary-clean);
+    letter-spacing: 0.5px;
+    text-align: center;
+}
+
+@keyframes pulseGlow {
+    0% { transform: scale(0.8); opacity: 0; }
+    30% { opacity: 1; }
+    100% { transform: scale(1.6); opacity: 0; }
+}
+
+@keyframes bounceArrow {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(12px); }
+    100% { transform: translateY(0px); }
 }
 
 /* ------------------------------------- */

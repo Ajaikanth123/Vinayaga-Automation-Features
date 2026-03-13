@@ -221,6 +221,16 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    // Handle scroll indicator visibility
+    const scrollIndicator = document.getElementById('scroll-indicator');
+    window.addEventListener('scroll', () => {
+        if (window.scrollY > 50) {
+            scrollIndicator.classList.add('hidden');
+        } else {
+            scrollIndicator.classList.remove('hidden');
+        }
+    });
+
     // Initialize the state once on load
     loadState();
     
