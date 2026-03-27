@@ -42,7 +42,11 @@ const data = [
     ["Search & Patient Lookup", "Advanced search system to find scans using patient name, ID, or scan date.", "Enables fast and efficient retrieval of patient scan records."],
     ["Mobile-Friendly Viewer", "Fully responsive viewer allowing doctors to access scans through mobile devices or tablets.", "Doctors can view scans anytime and anywhere without being limited to desktop systems."],
     ["Data Encryption", "Encryption system for protecting stored medical scan data and patient information.", "Protects sensitive healthcare information and improves data security."],
-    ["Dedicated Clinic Website Service", "Development of a dedicated website for the clinic integrated with the DICOM CONNECT platform for scan access and digital services.", "Helps clinics build a strong online presence and allows patients or doctors to access scan reports through the clinic's branded website."]
+    ["Dedicated Clinic Website Service", "Development of a dedicated website for the clinic integrated with the DICOM CONNECT platform for scan access and digital services.", "Helps clinics build a strong online presence and allows patients or doctors to access scan reports through the clinic's branded website."],
+    ["2D OPG Image Transfer Service", "High-quality 2D OPG scan transfer module sent before the main 3D scan.", "Provides immediate diagnostic value to doctors before the larger scan files are processed."],
+    ["Send Scan Report to Patient", "Direct digital delivery of diagnostic reports to patients via secure encrypted links.", "Enhances patient experience and reduces manual report collection efforts."],
+    ["3-Day Secure Link Validity", "Automatic expiration of scan viewing links after 72 hours for enhanced data security.", "Ensures patient privacy by limiting the exposure time of sensitive medical data."],
+    ["Facebook Meta Business Verification", "Integration and verification with Meta Business Suite for official clinical communication.", "Builds clinic trust and enables advanced communication features through Meta platforms."]
 ];
 
 let items_str = "";
