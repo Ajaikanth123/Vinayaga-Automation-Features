@@ -74,9 +74,40 @@ body {
 }
 
 .logo h1 {
-    font-size: 18px;
+    font-size: 1.5rem;
     font-weight: 700;
-    letter-spacing: 1px;
+    color: var(--primary);
+}
+
+.db-status-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: 500;
+    margin-left: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #ffcc00;
+    box-shadow: 0 0 5px #ffcc00;
+}
+
+.db-status-badge.connected .status-dot {
+    background: #00d26a;
+    box-shadow: 0 0 5px #00d26a;
+}
+
+.db-status-badge.error .status-dot {
+    background: #ff4d4d;
+    box-shadow: 0 0 5px #ff4d4d;
 }
 
 .roadmap-header h2 {

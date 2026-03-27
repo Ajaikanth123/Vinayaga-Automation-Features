@@ -158,40 +158,76 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     };
 
-    // Save state to localStorage
-    const saveState = () => {
-        const state = {};
-        const allCheckboxes = document.querySelectorAll('input[type="checkbox"]');
-        allCheckboxes.forEach(cb => {
-            state[cb.id] = cb.checked;
-        });
-        localStorage.setItem('dicomRoadmapState', JSON.stringify(state));
+    const updateDbStatus = (status, text) => {
+        const badge = document.getElementById('db-status');
+        const statusText = badge.querySelector('.status-text');
+        
+        badge.classList.remove('connected', 'error');
+        if (status) badge.classList.add(status);
+        statusText.innerText = text;
     };
 
-    // Load state from localStorage
-    const loadState = () => {
-        const savedState = localStorage.getItem('dicomRoadmapState');
-        if (savedState) {
-            const state = JSON.parse(savedState);
-            const allCheckboxes = document.querySelectorAll('input[type="checkbox"]');
-            
-            allCheckboxes.forEach(cb => {
-                if (state[cb.id]) {
-                    cb.checked = true;
-                }
+    // Save state to Supabase
+    const saveState = async (id, checked) => {
+        if (!_supabase) return;
+        
+        try {
+            const { error } = await _supabase.from('feature_states').upsert({ 
+                id: id, 
+                checked: checked,
+                updated_at: new Date().toISOString()
             });
-
-            // Re-evaluate completions after loading all states
-            // We check them sequentially starting from phase 0 to trigger cascades
-            for (let i = 0; i < 4; i++) {
-                checkPhaseCompletion(i);
-            }
             
-            // Re-evaluate active card based on scroll after loading
-            updateActiveState();
+            if (error) throw error;
+            console.log(`Saved ${id}: ${checked}`);
+        } catch (err) {
+            console.error('Error saving to Supabase:', err.message);
+        }
+    };
+
+    // Load state from Supabase
+    const loadState = async () => {
+        updateDbStatus(null, 'Connecting...');
+        if (typeof _supabase === 'undefined') {
+            updateDbStatus('error', 'SDK Blocked');
+            return;
+        }
+
+        try {
+            const { data, error } = await _supabase.from('feature_states').select('*');
+            
+            if (error) throw error;
+
+            updateDbStatus('connected', 'Connected');
+
+            if (data && data.length > 0) {
+                const allCheckboxes = document.querySelectorAll('input[type="checkbox"]');
+                
+                // Create a map for faster lookup
+                const stateMap = {};
+                data.forEach(item => {
+                    stateMap[item.id] = item.checked;
+                });
+
+                allCheckboxes.forEach(cb => {
+                    if (stateMap[cb.id] !== undefined) {
+                        cb.checked = stateMap[cb.id];
+                    }
+                });
+
+                // Re-evaluate completions after loading all states
+                for (let i = 0; i < 4; i++) {
+                    checkPhaseCompletion(i);
+                }
+                
+                updateActiveState();
+            }
+        } catch (err) {
+            console.error('Error loading from Supabase:', err.message);
+            // Fallback to localStorage if Supabase fails? 
+            // The user wanted to remove cache issues, so maybe just log it.
         }
         
-        // Ensure checkboxes are initialized to the correct interactability state
         updateCheckboxInteractability();
     };
 
@@ -199,12 +235,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const allCheckboxes = document.querySelectorAll('input[type="checkbox"]');
     allCheckboxes.forEach(cb => {
         cb.addEventListener('change', (e) => {
-            // Find which phase card this checkbox belongs to
             const phaseCard = e.target.closest('.phase-card');
             const phaseIndex = Array.from(cards).indexOf(phaseCard);
             
             checkPhaseCompletion(phaseIndex);
-            saveState();
+            saveState(e.target.id, e.target.checked);
         });
     });
 
@@ -232,10 +267,10 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Initialize the state once on load
-    loadState();
-    
-    // Ensure the first card is centered immediately (optional depending on design preference)
-    scrollToCard(0);
+    loadState().then(() => {
+        // Ensure the first card is centered immediately
+        scrollToCard(0);
+    });
 
     // --- Vertical Features Animation (Slide In) ---
     const featureObserver = new IntersectionObserver((entries, observer) => {
